@@ -85,20 +85,25 @@ iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						-j ACCEPT -m comment 
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.131 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ##
 ### Libere Repasse de Pacotes para os Serviços mais comuns para as Máquinas das SubRedes:
-for PORTS in 20 21 25 110 143 993
+for PORTS in 20 21 25 110 123 143 514 993
 do
-   iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Redirecione o Serviço SSH" 
-   iptables -A FORWARD -p tcp  -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 		-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
+   iptables -A FORWARD -p tcp -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 			-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
 done
 ##
+for PORTS in 123 514
+do
+   iptables -A FORWARD -p udp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
+   iptables -A FORWARD -p udp -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 			-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
+done
 ## 10.1 - Liberar o ssh interno
-iptables -t filter -A OUTPUT  -p tcp -s 0/0 -d $LAN --dport 22 					-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
-iptables -t filter -A INPUT   -p tcp -s $LAN --sport 22 -d 0/0 					-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
-iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN --dport 22 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+iptables -t filter -A OUTPUT  -p tcp -s 0/0 -d $LAN --dport 22 					-j ACCEPT -m comment --comment "Liberar o ssh interno"
+iptables -t filter -A INPUT   -p tcp -s $LAN --sport 22 -d 0/0 					-j ACCEPT -m comment --comment "Liberar o ssh interno"
+iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN --dport 22 				-j ACCEPT -m comment --comment "Liberar o ssh interno"
 ##
 ## 10.2 - Liberar a VPN para a Cloud
-iptables -t filter -A OUTPUT -p udp -s 0/0 -d $VPNCLOUD --dport 1194 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH" 
-iptables -t filter -A INPUT -p udp -s $VPNCLOUD --sport 1194 -d 0/0 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+iptables -t filter -A OUTPUT -p udp -s 0/0 -d $VPNCLOUD --dport 1194 				-j ACCEPT -m comment --comment "Liberar a VPN para a Cloud" 
+iptables -t filter -A INPUT -p udp -s $VPNCLOUD --sport 1194 -d 0/0 				-j ACCEPT -m comment --comment "Liberar a VPN para a Cloud"
 ##
 ## 11- Liberar Squid LDAP no Firewall
 iptables -t filter -A INPUT  -p tcp -s $LAN -i eth1 --dport 3128 				-j ACCEPT -m comment --comment "Liberar SQUID no Firewall"
