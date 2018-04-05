@@ -16,111 +16,110 @@ TUNVPN="172.17.0.0/16"
 export FWWAN1 FWWAN2 LAN FWLAN1 FWLAN2 DATACENTER MAQINTERNA MAQEXTERNA LDAPSAMBA4 VPN VPNCLOUD TUNVPN
 ##
 ## 2 - Liberar acesso ao loopback – 127.0.0.1
-iptables -t filter -A INPUT	-s 0/0	-i lo	-j ACCEPT
-iptables -t filter -A OUTPUT 	-s 0/0 	-o lo	-j ACCEPT
+iptables -t filter -A INPUT	-s 0/0	-i lo							-j ACCEPT -m comment --comment "Liberar acesso ao loopback"
+iptables -t filter -A OUTPUT 	-s 0/0 	-o lo							-j ACCEPT -m comment --comment "Liberar acesso ao loopback"
 ##
 ## 3- Liberar Ping do Firewall para Internet e da rede interna
-iptables -t filter -A OUTPUT -p icmp -s 0/0 -d 0/0 -j ACCEPT
-iptables -t filter -A INPUT  -p icmp --icmp-type 0 -s 0/0 -d 0/0 -j ACCEPT
-iptables -t filter -A INPUT  -p icmp --icmp-type 8 -s $LAN -d 0/0 -j ACCEPT
+iptables -t filter -A OUTPUT -p icmp -s 0/0 -d 0/0 						-j ACCEPT -m comment --comment "Liberar Ping para Internet e da rede interna"
+iptables -t filter -A INPUT  -p icmp --icmp-type 0 -s 0/0 -d 0/0 				-j ACCEPT -m comment --comment "Liberar Ping para Internet e da rede interna"
+iptables -t filter -A INPUT  -p icmp --icmp-type 8 -s $LAN -d 0/0 				-j ACCEPT -m comment --comment "Liberar Ping para Internet e da rede interna"
 ##
-## 4- Liberar Consulta DNS a partir do  Firewall
-iptables -t filter -A INPUT  -p udp -s 0/0 --sport 53 -i eth1 -j ACCEPT
-iptables -t filter -A OUTPUT -p udp -o eth1 -d 0/0 --dport 53 -j ACCEPT
+## 4- Liberar Consulta DNS a partir do Firewall
+iptables -t filter -A INPUT  -p udp -s 0/0 --sport 53 -i eth1 					-j ACCEPT -m comment --comment "Liberar Consulta DNS a partir do Firewall"
+iptables -t filter -A OUTPUT -p udp -o eth1 -d 0/0 --dport 53 					-j ACCEPT -m comment --comment "Liberar Consulta DNS a partir do Firewall"
 ##
 ## 5- Permitir Acesso a Internet pelo Firewall
-iptables -t filter -A INPUT  -p tcp -m multiport -s 0/0 --sport 80,443 -i eth0  -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp -m multiport -o eth0  -d 0/0 --dport 80,443 -j ACCEPT
+iptables -t filter -A INPUT  -p tcp -m multiport -s 0/0 --sport 80,443 -i eth0  		-j ACCEPT -m comment --comment "Permitir Acesso a Internet pelo Firewall"
+iptables -t filter -A OUTPUT -p tcp -m multiport -o eth0  -d 0/0 --dport 80,443 		-j ACCEPT -m comment --comment "Permitir Acesso a Internet pelo Firewall"
 ##
 ## 5.1 - Permitir Acesso Interno do firewall
-iptables -t filter -A INPUT  -p tcp -m multiport -s $LAN --sport 20,21,80,443 -i eth1,eth2 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp -m multiport -o eth1,eth2 -d $LAN --dport 20,21,80,443 -j ACCEPT
+iptables -t filter -A INPUT  -p tcp -m multiport -s $LAN --sport 20,21,80,443 -i eth1,eth2	-j ACCEPT -m comment --comment "Permitir Acesso Interno do firewall"
+iptables -t filter -A OUTPUT -p tcp -m multiport -o eth1,eth2 -d $LAN --dport 20,21,80,443 	-j ACCEPT -m comment --comment "Permitir Acesso Interno do firewall"
 ##
 ## 6- Liberar Acesso SSH da Máquina Interna para o Firewall
-iptables -t filter -A INPUT  -p tcp -s $LAN  -d $LAN --dport 22 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp -s $LAN --sport 22 -d $LAN -j ACCEPT
+iptables -t filter -A INPUT  -p tcp -s $LAN  -d $LAN --dport 22 				-j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
+iptables -t filter -A OUTPUT -p tcp -s $LAN --sport 22 -d $LAN 					-j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
 ##
 ## 7 - Liberar "MASCARAMENTO" de Pacotes da Rede Interna para a Internet
-iptables -t nat -A POSTROUTING -s $LAN ! -d $LAN -j MASQUERADE
+iptables -t nat -A POSTROUTING -s $LAN ! -d $LAN 						-j MASQUERADE -m comment --comment "Liberar MASCARAMENTO de Pacotes" 
 ##
 ## 7.1- Liberar Acesso a Internet para as Máquinas das SubRedes
-iptables -t filter -A FORWARD -p tcp -m multiport -s $LAN -d 0/0 --dport 80,443 -j ACCEPT
-iptables -t filter -A FORWARD -p tcp -m multiport -s 0/0 --sport 80,443 -d $LAN  -j ACCEPT
+iptables -t filter -A FORWARD -p tcp -m multiport -s $LAN -d 0/0 --dport 80,443 		-j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
+iptables -t filter -A FORWARD -p tcp -m multiport -s 0/0 --sport 80,443 -d $LAN  		-j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
 ##
 ## 8- Liberar Acesso a Consulta DNS para as Máquinas das SubRedes
-iptables -t filter -A FORWARD -p udp -s $LAN -d 0/0 --dport 53 -j ACCEPT
-iptables -t filter -A FORWARD -p udp -s 0/0 --sport 53 -d $LAN -j ACCEPT
+iptables -t filter -A FORWARD -p udp -s $LAN -d 0/0 --dport 53 					-j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
+iptables -t filter -A FORWARD -p udp -s 0/0 --sport 53 -d $LAN 					-j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
 ##
 ## 8.1- Liberar Ping das SubRedes para a Internet
-iptables -t filter -A FORWARD -p icmp -s $LAN -d 0/0  -j ACCEPT
-iptables -t filter -A FORWARD -p icmp -s 0/0 -d $LAN -j ACCEPT
+iptables -t filter -A FORWARD -p icmp -s $LAN -d 0/0  						-j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
+iptables -t filter -A FORWARD -p icmp -s 0/0 -d $LAN 						-j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
 ##
 ## 8.2 - Libera o acesso DNS
-iptables -t filter -A INPUT  -p udp -s $LAN --sport 53 -i eth1,eth2 -j ACCEPT
-iptables -t filter -A OUTPUT -p udp -d $LAN --dport 53 -o eth1,eth2 -j ACCEPT
+iptables -t filter -A INPUT  -p udp -s $LAN --sport 53 -i eth1,eth2 				-j ACCEPT -m comment --comment "Libera o acesso DNS"
+iptables -t filter -A OUTPUT -p udp -d $LAN --dport 53 -o eth1,eth2 				-j ACCEPT -m comment --comment "Libera o acesso DNS"
 ##
 ## Liberar transferencia de pacotes pelo firewall 
-iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN -j ACCEPT
-iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN -j ACCEPT
+iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN 						-j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
+iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						-j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
 ##
 ## 9- Redirecione o Serviço SSH para os Servidores Internos
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 52000 -j DNAT --to 192.168.200.30:22
-   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.30 --dport 22 -j ACCEPT
-   iptables -t filter -A FORWARD -p tcp -s 192.168.200.30 --sport 22 -d 0/0 -j ACCEPT
+   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.30 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -t filter -A FORWARD -p tcp -s 192.168.200.30 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 53000 -j DNAT --to 192.168.200.40:22
-   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.40 --dport 22 -j ACCEPT
-   iptables -t filter -A FORWARD -p tcp -s 192.168.200.40 --sport 22 -d 0/0 -j ACCEPT
+   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.40 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -t filter -A FORWARD -p tcp -s 192.168.200.40 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 54000 -j DNAT --to 192.168.200.50:22
-   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.50 --dport 22 -j ACCEPT
-   iptables -t filter -A FORWARD -p tcp -s 192.168.200.50 --sport 22 -d 0/0 -j ACCEPT
+   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.50 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -t filter -A FORWARD -p tcp -s 192.168.200.50 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 55000 -j DNAT --to 192.168.200.130:22
-   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.130 --dport 22 -j ACCEPT
-   iptables -t filter -A FORWARD -p tcp -s 192.168.200.130 --sport 22 -d 0/0 -j ACCEPT
+   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.130 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -t filter -A FORWARD -p tcp -s 192.168.200.130 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 56000 -j DNAT --to 192.168.200.131:22
-   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.131 --dport 22 -j ACCEPT
-   iptables -t filter -A FORWARD -p tcp -s 192.168.200.131 --sport 22 -d 0/0 -j ACCEPT
+   iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.131 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+   iptables -t filter -A FORWARD -p tcp -s 192.168.200.131 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+##
 ### Libere Repasse de Pacotes para os Serviços mais comuns para as Máquinas das SubRedes:
 for PORTS in 20 21 25 110 143 993
 do
-   iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS -j ACCEPT 
-   iptables -A FORWARD -p tcp  -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 -j ACCEPT
+   iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Redirecione o Serviço SSH" 
+   iptables -A FORWARD -p tcp  -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 		-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 done
 ##
 ## 10.1 - Liberar o ssh interno
-iptables -t filter -A OUTPUT  -p tcp -s 0/0 -d $LAN --dport 22 -j ACCEPT
-iptables -t filter -A INPUT   -p tcp -s $LAN --sport 22 -d 0/0 -j ACCEPT
-iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN --dport 22 -j ACCEPT
+iptables -t filter -A OUTPUT  -p tcp -s 0/0 -d $LAN --dport 22 					-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+iptables -t filter -A INPUT   -p tcp -s $LAN --sport 22 -d 0/0 					-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
+iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN --dport 22 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ##
 ## 10.2 - Liberar a VPN para a Cloud
-iptables -t filter -A OUTPUT -p udp -s 0/0 -d $VPNCLOUD --dport 1194 -j ACCEPT 
-iptables -t filter -A INPUT -p udp -s $VPNCLOUD --sport 1194 -d 0/0 -j ACCEPT
+iptables -t filter -A OUTPUT -p udp -s 0/0 -d $VPNCLOUD --dport 1194 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH" 
+iptables -t filter -A INPUT -p udp -s $VPNCLOUD --sport 1194 -d 0/0 				-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ##
 ## 11- Liberar Squid LDAP no Firewall
-##
-iptables -t filter -A INPUT  -p tcp -s $LAN -i eth1 --dport 3128 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp -o eth1 --sport 3128 -d $LAN -j ACCEPT
-##
-iptables -t filter -A OUTPUT -p tcp -s 0/0 -d $DATACENTER --dport 389 -j ACCEPT
-iptables -t filter -A INPUT  -p tcp -s $DATACENTER --sport 389 -d 0/0 -j ACCEPT
+iptables -t filter -A INPUT  -p tcp -s $LAN -i eth1 --dport 3128 				-j ACCEPT -m comment --comment "Liberar SQUID no Firewall"
+iptables -t filter -A OUTPUT -p tcp -o eth1 --sport 3128 -d $LAN 				-j ACCEPT -m comment --comment "Liberar SQUID no Firewall"
+iptables -t filter -A OUTPUT -p tcp -s 0/0 -d $DATACENTER --dport 389 				-j ACCEPT -m comment --comment "Liberar LDAP no Firewall"
+iptables -t filter -A INPUT  -p tcp -s $DATACENTER --sport 389 -d 0/0 				-j ACCEPT -m comment --comment "Liberar LDAP no Firewall"
 ##
 ## 12 - Liberar comunicacao pela VPN
-iptables -t filter -A OUTPUT -p tcp -s 0/0 -d 0/0 --dport 5000 -j ACCEPT
-iptables -t filter -A OUTPUT -p udp -s 0/0 -d 0/0 --dport 5000 -j ACCEPT
-iptables -t filter -A INPUT  -p tcp -s 0/0 -d 0/0 --dport 5000 -j ACCEPT
-iptables -t filter -A INPUT  -p udp -s 0/0 -d 0/0 --dport 5000 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp -s 0/0 -d 0/0 --dport 5000 					-j ACCEPT -m comment --comment "Liberar comunicacao pela VPN"
+iptables -t filter -A OUTPUT -p udp -s 0/0 -d 0/0 --dport 5000 					-j ACCEPT -m comment --comment "Liberar comunicacao pela VPN"
+iptables -t filter -A INPUT  -p tcp -s 0/0 -d 0/0 --dport 5000 					-j ACCEPT -m comment --comment "Liberar comunicacao pela VPN"
+iptables -t filter -A INPUT  -p udp -s 0/0 -d 0/0 --dport 5000 					-j ACCEPT -m comment --comment "Liberar comunicacao pela VPN"
 ##
 ## 12.1 - Libera ssh da Linux Externa para o Firewall 
-iptables -t filter -A INPUT -p tcp -s $MAQEXTERNA -d 0/0 --dport 22 -j ACCEPT
-iptables -t filter -A OUTPUT -p tcp -s 0/0 --sport 22 -d $MAQEXTERNA -j ACCEPT 
+iptables -t filter -A INPUT -p tcp -s $MAQEXTERNA -d 0/0 --dport 22 				-j ACCEPT -m comment --comment "Libera ssh da Linux Externa para o Firewall"
+iptables -t filter -A OUTPUT -p tcp -s 0/0 --sport 22 -d $MAQEXTERNA 				-j ACCEPT -m comment --comment "Libera ssh da Linux Externa para o Firewall" 
 ##
 ## Libera ping para tun0
-iptables -t filter -A OUTPUT -p icmp -d $TUNVPN -j ACCEPT
-iptables -t filter -A INPUT  -p icmp -s $TUNVPN -j ACCEPT
+iptables -t filter -A OUTPUT -p icmp -d $TUNVPN 						-j ACCEPT -m comment --comment "Libera ping para tun0"
+iptables -t filter -A INPUT  -p icmp -s $TUNVPN 						-j ACCEPT -m comment --comment "Libera ping para tun0"
 ##
-##Libera Acesso do tunel
-iptables -t filter -A FORWARD -d $TUNVPN -s $LAN -j ACCEPT
-iptables -t filter -A FORWARD -s $TUNVPN -d $LAN -j ACCEPT
+## Libera Acesso do tunel vpn
+iptables -t filter -A FORWARD -d $TUNVPN -s $LAN 						-j ACCEPT -m comment --comment "Libera Acesso do tunel vpn"
+iptables -t filter -A FORWARD -s $TUNVPN -d $LAN 						-j ACCEPT -m comment --comment "Libera Acesso do tunel vpn"
