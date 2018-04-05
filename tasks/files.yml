@@ -2,10 +2,15 @@
 # tasks file for iac-ansible-iptables
 
 - name: Define o arquivo de regras
+  copy: src=ip_forward.conf dest=/etc/sysctl.d/ip_forward.conf owner=root group=root mode=0444
+  register: ipforward
+
+- name: Define o arquivo de regras /etc/rules
+  when: ipforward|sucess
   copy: src=etc-rules dest=/etc/rules owner=root group=root mode=0444
   register: rules
 
-- name: Define o arquivo inicalizacao de servico (Firewall)
+- name: Define o arquivo inicalizacao de servico (Firewall) /etc/init.d/firewall
   when: rules|success
   copy: src=etc-initd-firewall dest=/etc/init.d/firewall owner=root group=root mode=0555
   notify: 
