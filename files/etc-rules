@@ -85,7 +85,7 @@ iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						-j ACCEPT -m comment 
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.131 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ##
 ### Libere Repasse de Pacotes para os Serviços mais comuns para as Máquinas das SubRedes:
-for PORTS in 20 21 25 110 123 143 514 993
+for PORTS in 20 21 25 110 123 143 465 514 993 995 
 do
    iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
    iptables -A FORWARD -p tcp -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 			-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
