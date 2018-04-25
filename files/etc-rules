@@ -64,28 +64,28 @@ iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN 						-j ACCEPT -m comment 
 iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						-j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
 ##
 ## 9- Redirecione o Serviço SSH para os Servidores Internos
-   iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 52000 -j DNAT --to 192.168.200.30:22
+   iptables -t nat -A PREROUTING -p tcp -s 0/0 -i eth3 --dport 52000 -j DNAT --to 192.168.200.30:22
    iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.30 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.30 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
-   iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 53000 -j DNAT --to 192.168.200.40:22
+   iptables -t nat -A PREROUTING -p tcp -s 0/0 -i eth3 --dport 53000 -j DNAT --to 192.168.200.40:22
    iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.40 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.40 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
-   iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 54000 -j DNAT --to 192.168.200.50:22
+   iptables -t nat -A PREROUTING -p tcp -s 0/0 -i eth3 --dport 54000 -j DNAT --to 192.168.200.50:22
    iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.50 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.50 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
-   iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 55000 -j DNAT --to 192.168.200.130:22
+   iptables -t nat -A PREROUTING -p tcp -s 0/0 -i eth3 --dport 55000 -j DNAT --to 192.168.200.130:22
    iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.130 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.130 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ### Redirect
-   iptables -t nat -A PREROUTING -p tcp -s 0/0 -d $FWWAN2 --dport 56000 -j DNAT --to 192.168.200.131:22
+   iptables -t nat -A PREROUTING -p tcp -s 0/0 -o eth3 --dport 56000 -j DNAT --to 192.168.200.131:22
    iptables -t filter -A FORWARD -p tcp -s 0/0 -d 192.168.200.131 --dport 22 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
    iptables -t filter -A FORWARD -p tcp -s 192.168.200.131 --sport 22 -d 0/0 			-j ACCEPT -m comment --comment "Redirecione o Serviço SSH"
 ##
 ### Libere Repasse de Pacotes para os Serviços mais comuns para as Máquinas das SubRedes:
-for PORTS in 20 21 25 110 123 143 465 514 993 995 
+for PORTS in 20 21 25 110 123 143 465 514 993 995 8140
 do
    iptables -A FORWARD -p tcp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
    iptables -A FORWARD -p tcp -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 			-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
@@ -93,8 +93,8 @@ done
 ##
 for PORTS in 123 514
 do
-   iptables -A FORWARD -p udp -s $LAN  --sport 1024:65535  -d 0/0 --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
-   iptables -A FORWARD -p udp -s 0/0 --sport $PORTS -d $LAN --dport 1024:65535 			-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
+   iptables -A FORWARD -p udp -s $LAN  --sport 1024:65535  -d 0/0  --dport $PORTS 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns" 
+   iptables -A FORWARD -p udp -s 0/0   --sport $PORTS      -d $LAN --dport 1024:65535 		-j ACCEPT -m comment --comment "Repasse de Pacotes para os Serviços mais comuns"
 done
 ## 10.1 - Liberar o ssh interno
 iptables -t filter -A OUTPUT  -p tcp -s 0/0 -d $LAN --dport 22 					-j ACCEPT -m comment --comment "Liberar o ssh interno"
