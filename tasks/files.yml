@@ -9,7 +9,7 @@
     group: root 
     mode: 0444
   register: RULES
-  when: ( SYSCTL is sucess )
+  #when: ( SYSCTL is sucess )
 
 - name: "Define o arquivo inicalizacao de servico (Firewall) /etc/init.d/firewall"
   copy: 
