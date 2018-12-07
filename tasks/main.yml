@@ -1,7 +1,6 @@
 ---
 # tasks file for iac-ansible-iptables
 
-
 - name: Definindo parametro para systcl.conf
   import_tasks: sysctl.yml
   when: (ansible_system == "Linux") 
