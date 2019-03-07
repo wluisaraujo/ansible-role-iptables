@@ -33,7 +33,7 @@ Example Playbook
     - name: value
   roles:
     - iac-ansible-iptables
-...	
+...
 ```
 
 License
