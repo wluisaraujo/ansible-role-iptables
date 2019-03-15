@@ -32,10 +32,10 @@ Example Playbook
 ```yaml
 ---
 - hosts: localhost
-  vars:
-    - name: value
+  vars_files:
+    - vars/main.yml
   roles:
-    - iac-ansible-iptables
+    - { role: iac-ansible-iptables }
 ...
 ```
 
