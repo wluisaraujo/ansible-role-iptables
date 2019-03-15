@@ -1,0 +1,98 @@
+#!/bin/bash
+# /etc/init.d/firewall
+#
+# Firewall init script, to be used with /etc/iptables-rules by 4Linux
+#
+# @author 4Linux
+
+### BEGIN INIT INFO
+# Provides:			firewall
+# Required-Start:	$syslog
+# Required-Stop:	$syslog
+# Default-Start:	2 3 4 5
+# Default-Stop:		0 1 6
+# Short-Description: Start firewall at boot time.
+# Description:       Enable the firewall.
+### END INIT INFO
+
+# Script de Firewall 
+# Treinamento da 4Linux - Formação Linux
+### CORES
+VERDE="\033[1;32m"
+AMARELO="\033[1;33m"
+AZUL="\033[1;34m"
+VERMELHO="\033[1;31m"
+END="\033[m"
+###
+ProgressBar() {
+  tput civis
+  for X in $(seq 20)
+  do  
+    for i in ..
+    do  
+      echo -en "\033[1D$i"
+      sleep .1
+    done
+  done
+  tput cnorm
+}
+
+case $1 in
+
+stop)
+
+	# Definindo Politica ACCEPT - ACEITA TUDO
+	iptables -t filter -P OUTPUT ACCEPT
+	iptables -t filter -P INPUT ACCEPT
+	iptables -t filter -P FORWARD ACCEPT
+
+	# Limpar as Regras de todas as tableas
+	iptables -t filter -F
+	iptables -t nat -F
+	iptables -t mangle -F
+	iptables -t raw -F
+	iptables -t security -F
+
+	# Bloquear a passagem de pacotes pelo kernel
+	echo 0 > /proc/sys/net/ipv4/ip_forward
+	echo -en "Stopping Security Firewall Dexter ";ProgressBar; echo -e " [\033[0;32m ok\033[m ]"
+
+;;
+
+start)
+	$0 stop
+	sleep 0.5
+	echo -en "Starting Security Firewall Dexter ";ProgressBar; echo -e " [\033[0;32m ok\033[m ]"
+	# liberar a passagem de pacotes pelo kernel
+	echo 1 > /proc/sys/net/ipv4/ip_forward
+
+	# Politicas que bloqueiam qualquer tipo de Conexão
+	iptables -P OUTPUT DROP
+	iptables -P INPUT DROP
+	iptables -P FORWARD DROP
+
+	# Iniciando as Regras
+	bash /etc/iptables-rules
+;;
+
+status)
+    echo -e "`iptables -L -n`"
+    EXIT=4 # program or service status is unknown
+    NUMBER_OF_RULES=$(iptables-save | grep '^\-' | wc -l)
+    if [ 0 -eq $NUMBER_OF_RULES ]; then
+        EXIT=3 # program is not running
+    else
+        EXIT=0 # program is running or service is OK
+    fi
+    exit $EXIT
+;;
+
+restart)
+	$0 start
+;;
+
+*)
+	echo 'POR FAVOR USE "stop|start|status|restart"'
+;;
+
+esac

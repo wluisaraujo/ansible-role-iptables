@@ -1,11 +1,56 @@
 ---
 # handlers file for iac-ansible-iptables
-- name: Start iptables
-  service: name=firewall state=started enable=yes
-  
-- name: Stop iptables
-  service: name=firewall state=stoped
-  
-- name: Restart iptables
-  service: name=firewall state=restarted  
+
+## SystemV
+- name: Start Firewall
+  service:
+    state: started
+    name: firewall
+    enabled: yes
+  when: 
+    - ansible_service_mgr == "service"
+
+- name: Stop Firewall
+  service:
+    state: stopped
+    name: firewall
+  when: 
+    - ansible_service_mgr == "service"
+
+- name: Restart Firewall
+  service:
+    state: restarted
+    name: firewall
+  when: 
+    - ansible_service_mgr == "service"
+
+## SystemD
+- name: Start Firewall
+  systemd:
+    state: started
+    name: firewall.service
+    enabled: yes
+    force: yes
+  ignore_errors: yes
+  when: 
+    - ansible_service_mgr == "systemd"
+
+- name: Stop Firewall
+  systemd:
+    state: stopped
+    name: firewall.service
+    enabled: yes
+    force: yes
+  ignore_errors: yes
+  when: 
+    - ansible_service_mgr == "systemd"
+
+- name: Restart Firewall
+  systemd:
+    state: restarted
+    name: firewall.service
+    force: yes
+  ignore_errors: yes
+  when: 
+    - ansible_service_mgr == "systemd"        
 ...

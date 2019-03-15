@@ -1,11 +1,31 @@
 ---
 # tasks file for iac-ansible-iptables
 
+- name: Instalando iptables
+  package: 
+    name: iptables 
+    state: present
+
+- import_tasks: disable-firewalls.yml
+  when:
+    - ansible_system == "Linux" 
+    - firewall_disable_firewalld or 
+    - firewall_disable_ufw
+
 - name: Definindo parametro para systcl.conf
   import_tasks: sysctl.yml
-  when: ( ansible_system == "Linux" ) 
+  when: 
+    - ansible_system == "Linux"
 
 - name: Criando arquivos de configuracao
-  import_tasks: files.yml
-  when: ( ansible_system == "Linux" ) 
+  import_tasks: files-systemv.yml
+  when: 
+    - ansible_system == "Linux"
+    - ansible_service_mgr == "service"
+
+- name: Criando arquivos de configuracao
+  import_tasks: files-systemd.yml
+  when: 
+    - ansible_system == "Linux"
+    - ansible_service_mgr == "systemd"
 ...

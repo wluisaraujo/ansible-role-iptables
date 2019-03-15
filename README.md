@@ -6,7 +6,7 @@
 Description
 ------------
 
- * 
+Configura iptables firewall Linux. Com suporte para IPv4
  
 Requirements
 ------------
@@ -18,6 +18,9 @@ Role Variables
 --------------
 
 [defaults/main.yml](defaults/main.yml)
+
+    firewall_state: started
+    firewall_enabled_at_boot: true
 
 Dependencies
 ------------

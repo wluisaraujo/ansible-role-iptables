@@ -1,7 +1,7 @@
 galaxy_info:
   author: w.luis.araujo
   description: "Configure iptables firewall"
-  company: Personal
+  company: LUSAR
   license: "(GPLv3)"
   min_ansible_version: 1.5
   platforms:
@@ -11,5 +11,11 @@ galaxy_info:
   - name: Debian
     versions:
     - all
-  galaxy_tags: [iptables, firewall]
+  galaxy_tags: 
+    - iptables
+    - firewall
+    - system
+    - security
+    - tcp
+    - ipv4
 dependencies: []

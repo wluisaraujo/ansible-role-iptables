@@ -1,2 +1,6 @@
 ---
 # vars file for iac-ansible-iptables
+NICWAN1: eth0
+NICWAN2: eth3
+NICLAN1: eth1
+NICLAN2: eth2

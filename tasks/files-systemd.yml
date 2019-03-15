@@ -1,0 +1,34 @@
+---
+# tasks file for iac-ansible-iptables
+
+- name: "Define o arquivo de regras /etc/iptables-rules"
+  template: 
+    src: rules.j2 
+    dest: /etc/iptables-rules 
+    owner: root 
+    group: root 
+    mode: 0554
+  register: RULES
+  when: 
+    - SYSCTL is success
+#  notify: 
+#    - Start Firewall
+
+- name: "Define o arquivo inicalizacao de servico Firewall"
+  template: 
+    src: firewall.service.j2
+    dest: /etc/systemd/system/firewall.service 
+    owner: root 
+    group: root 
+    mode: 0644
+  when:
+    - ansible_service_mgr == 'systemd'
+    - RULES is success
+  notify: 
+    - Start Firewall
+
+- systemd:
+    name: firewall
+    state: "{{ firewall_state }}"
+    enabled: "{{ firewall_enabled_at_boot }}"    
+...

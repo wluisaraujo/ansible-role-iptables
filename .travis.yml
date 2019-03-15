@@ -6,18 +6,19 @@ python: "2.7"
 sudo: true
 
 # This playbook need to run on Ubuntu 14.04 or later
-dist: trust
+#dist: trust
 
 services:
  - docker
 
 env:
- - global:
-     ANSIBLE_ACTION_WARNINGS="False"
-     ANSIBLE_COMMAND_WARNINGS="False"
-     ANSIBLE_DEPRECATION_WARNINGS="False"
-     ANSIBLE_SYSTEM_WARNINGS="False"
-     ANSIBLE_HOST_KEY_CHECKING="False"
+  global:
+    - ROLE_NAME: iac-ansible-iptables
+    - ANSIBLE_ACTION_WARNINGS: "False"
+    - ANSIBLE_COMMAND_WARNINGS: "False"
+    - ANSIBLE_DEPRECATION_WARNINGS: "False"
+    - ANSIBLE_SYSTEM_WARNINGS: "False"
+    - ANSIBLE_HOST_KEY_CHECKING: "False"
      
  - distribution: centos
    version: 7
@@ -27,8 +28,8 @@ env:
 #   version: 25
 # - distribution: fedora
 #   version: 24
- - distribution: ubuntu
-   version: xenial
+# - distribution: ubuntu
+#   version: xenial
 # - distribution: ubuntu
 #   version: trusty
  - distribution: debian
