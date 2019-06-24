@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: iac-ansible-iptables
   author: w.luis.araujo
   description: "Configure iptables firewall"
   company: LUSAR | wluisaraujo.github.io
