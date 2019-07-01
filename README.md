@@ -35,7 +35,7 @@ Example Playbook
   vars_files:
     - vars/main.yml
   roles:
-    - { role: iac-ansible-iptables }
+    - { role: iptables }
 ...
 ```
 

@@ -1,5 +1,5 @@
 ---
-# defaults file for iac-ansible-iptables
+# defaults file for iptables
 service_name: firewall
 firewall_state: started
 firewall_enabled_at_boot: true

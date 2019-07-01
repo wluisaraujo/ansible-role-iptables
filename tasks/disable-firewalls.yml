@@ -1,5 +1,5 @@
 ---
-# tasks file for iac-ansible-iptables
+# tasks file for iptables
 
 - name: Check firewalld (RHEL)
   command: yum list installed firewalld

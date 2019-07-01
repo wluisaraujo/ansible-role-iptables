@@ -1,6 +1,5 @@
 ---
-# tasks file for iac-ansible-iptables # Set ip forwarding on in /proc and do not reload the sysctl file
-
+# tasks file for iptables 
 - sysctl:
     name: "{{ item.name }}"
     state: present

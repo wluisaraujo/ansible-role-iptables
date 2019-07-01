@@ -1,5 +1,5 @@
 ---
-# handlers file for iac-ansible-iptables
+# handlers file for iptables
 
 ## SystemD
 - name: Start {{ service_name }}

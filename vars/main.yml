@@ -1,5 +1,5 @@
 ---
-# vars file for iac-ansible-iptables
+# vars file for iptables
 NICWAN1: eth0
 NICWAN2: eth3
 NICLAN1: eth1
