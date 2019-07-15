@@ -37,35 +37,35 @@ iptables -t filter -A INPUT  -p tcp -m multiport -s 0/0 --sport 80,443 -i $NICWA
 iptables -t filter -A OUTPUT -p tcp -m multiport -o $NICWAN1 -d 0/0 --dport 80,443 	-j ACCEPT -m comment --comment "Permitir Acesso a Internet pelo Firewall"
 ##
 ## 5.1 - Permitir Acesso Interno do firewall
-iptables -t filter -A INPUT  -p tcp -m multiport -s $LAN --sport 20,21,80,443 -i $NICLAN1,$NICLAN2	-j ACCEPT -m comment --comment "Permitir Acesso Interno do firewall"
+iptables -t filter -A INPUT  -p tcp -m multiport -s $LAN --sport 20,21,80,443 -i $NICLAN1,$NICLAN2	   -j ACCEPT -m comment --comment "Permitir Acesso Interno do firewall"
 iptables -t filter -A OUTPUT -p tcp -m multiport -o $NICLAN1,$NICLAN2 -d $LAN --dport 20,21,80,443 	-j ACCEPT -m comment --comment "Permitir Acesso Interno do firewall"
 ##
 ## 6- Liberar Acesso SSH da Máquina Interna para o Firewall
-iptables -t filter -A INPUT  -p tcp -s $LAN  -d $LAN --dport 22 				   -j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
-iptables -t filter -A OUTPUT -p tcp -s $LAN --sport 22 -d $LAN 					-j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
+iptables -t filter -A INPUT  -p tcp -s $LAN  -d $LAN --dport 22 				         -j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
+iptables -t filter -A OUTPUT -p tcp -s $LAN --sport 22 -d $LAN 					      -j ACCEPT -m comment --comment "Liberar Acesso SSH da MAQINTERNA para o Firewall"
 ##
 ## 7 - Liberar "MASCARAMENTO" de Pacotes da Rede Interna para a Internet
-iptables -t nat -A POSTROUTING -s $LAN ! -d $LAN 						-j MASQUERADE -m comment --comment "Liberar MASCARAMENTO de Pacotes" 
+iptables -t nat -A POSTROUTING -s $LAN ! -d $LAN 						                  -j MASQUERADE -m comment --comment "Liberar MASCARAMENTO de Pacotes" 
 ##
 ## 7.1- Liberar Acesso a Internet para as Máquinas das SubRedes
-iptables -t filter -A FORWARD -p tcp -m multiport -s $LAN -d 0/0 --dport 80,443 		   -j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
-iptables -t filter -A FORWARD -p tcp -m multiport -s 0/0 --sport 80,443 -d $LAN  		-j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
+iptables -t filter -A FORWARD -p tcp -m multiport -s $LAN -d 0/0 --dport 80,443 		-j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
+iptables -t filter -A FORWARD -p tcp -m multiport -s 0/0 --sport 80,443 -d $LAN  	-j ACCEPT -m comment --comment "Liberar Acesso a Internet para as SubRedes"
 ##
 ## 8- Liberar Acesso a Consulta DNS para as Máquinas das SubRedes
-iptables -t filter -A FORWARD -p udp -s $LAN -d 0/0 --dport 53 					-j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
-iptables -t filter -A FORWARD -p udp -s 0/0 --sport 53 -d $LAN 					-j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
+iptables -t filter -A FORWARD -p udp -s $LAN -d 0/0 --dport 53 					      -j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
+iptables -t filter -A FORWARD -p udp -s 0/0 --sport 53 -d $LAN 					      -j ACCEPT -m comment --comment "Liberar Acesso a Consulta DNS"
 ##
 ## 8.1- Liberar Ping das SubRedes para a Internet
-iptables -t filter -A FORWARD -p icmp -s $LAN -d 0/0  						-j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
-iptables -t filter -A FORWARD -p icmp -s 0/0 -d $LAN 						-j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
+iptables -t filter -A FORWARD -p icmp -s $LAN -d 0/0  						            -j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
+iptables -t filter -A FORWARD -p icmp -s 0/0 -d $LAN 						               -j ACCEPT -m comment --comment "Liberar Ping das SubRedes"
 ##
 ## 8.2 - Libera o acesso DNS
-iptables -t filter -A INPUT  -p udp -s $LAN --sport 53 -i $NICLAN1,$NICLAN2 				-j ACCEPT -m comment --comment "Libera o acesso DNS"
-iptables -t filter -A OUTPUT -p udp -d $LAN --dport 53 -o $NICLAN1,$NICLAN2				-j ACCEPT -m comment --comment "Libera o acesso DNS"
+iptables -t filter -A INPUT  -p udp -s $LAN --sport 53 -i $NICLAN1,$NICLAN2 			-j ACCEPT -m comment --comment "Libera o acesso DNS"
+iptables -t filter -A OUTPUT -p udp -d $LAN --dport 53 -o $NICLAN1,$NICLAN2			-j ACCEPT -m comment --comment "Libera o acesso DNS"
 ##
 ## Liberar transferencia de pacotes pelo firewall 
-iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN 						-j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
-iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						-j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
+iptables -t filter -A FORWARD -p tcp -s $LAN -d $LAN 						               -j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
+iptables -t filter -A FORWARD -p udp -s $LAN -d $LAN 						               -j ACCEPT -m comment --comment "Liberar transferencia de pacotes"
 ##
 ## 9- Redirecione o Serviço SSH para os Servidores Internos
    iptables -t nat -A PREROUTING -p tcp -s 0/0 -i $NICWAN2 --dport 52000 -j DNAT --to 192.168.200.30:22
