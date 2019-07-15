@@ -12,6 +12,13 @@ Requirements
 
  * 
 
+Installation
+------------
+
+```console
+vagrant@localhost:~$ ansible-galaxy install wluisaraujo.iptables
+```
+
 
 Role Variables
 --------------
