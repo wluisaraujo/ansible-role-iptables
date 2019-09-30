@@ -18,6 +18,7 @@ Installation
 
 ```console
 vagrant@localhost:~$ ansible-galaxy install wluisaraujo.iptables
+vagrant@localhost:~$ ansible-galaxy install -r wluisaraujo.iptables/requirements.txt
 ```
 
 
